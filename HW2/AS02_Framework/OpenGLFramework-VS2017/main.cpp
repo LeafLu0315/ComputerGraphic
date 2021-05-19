@@ -617,7 +617,7 @@ void setShaders()
 	iLocKa = glGetUniformLocation(p, "material.Ka");
 	iLocKd = glGetUniformLocation(p, "material.Kd");
 	iLocKs = glGetUniformLocation(p, "material.Ks");
-	iLocViewPos = glGetUniformLocation(p, "viewPos");
+	iLocViewPos = glGetUniformLocation(p, "view_position");
 	iLocShininess = glGetUniformLocation(p, "material.shininess");
 	iLocCutoffAngle = glGetUniformLocation(p, "light.angle");
 	//

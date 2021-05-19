@@ -5,15 +5,15 @@ in vec3 vertex_color;
 in vec3 vertex_normal;
 
 // customize
-in vec3 FragPos;
+in vec3 frag_position;
 in vec3 Normal;
-in vec3 LightPos;
+in vec3 light_position;
 uniform mat4 model;
 uniform mat4 view;
 uniform mat4 projection;
 uniform int shadingType;
 uniform int lightMode;
-uniform vec3 viewPos;
+uniform vec3 view_position;
 
 struct Light  {
 	int angle;
@@ -56,10 +56,10 @@ void main() {
             vec3 diffuse = light.diffuse*material.Kd*diff ;
 
             // specular
-            vec3 viewDir = normalize(viewPos-FragPos);
-            vec3 halfwayDir = normalize(light_direction+viewDir);
-            float spec = pow(max(dot(norm, halfwayDir), 0.0), material.shininess);
-            vec3 specular = lightspecular * (spec * material.Ks);  
+            vec3 view_direction = normalize(view_position-frag_position);
+            vec3 halfwayDir = normalize(light_direction+view_direction);
+            float spec = pow(max(dot(norm, halfwayDir),0.0),material.shininess);
+            vec3 specular = lightspecular*(spec*material.Ks);  
 
             result = ambient + diffuse + specular;
             FragColor = vec4(result, 1.0f);
@@ -67,52 +67,52 @@ void main() {
         }
         if(lightMode==1){
             // diffuse
-            vec3 light_direction = normalize(LightPos-FragPos);
-            float diff = max(dot(norm, light_direction), 0.0);
-            vec3 diffuse = light.diffuse *  material.Kd  *  diff ;
+            vec3 light_direction = normalize(light_position-frag_position);
+            float diff = max(dot(norm,light_direction), 0.0);
+            vec3 diffuse = light.diffuse*material.Kd*diff ;
 
             // specular
-            vec3 viewDir = normalize(viewPos - FragPos);
-            vec3 halfwayDir = normalize(light_direction + viewDir);
-            float spec = pow(max(dot(norm, halfwayDir), 0.0), material.shininess);
-            vec3 specular = lightspecular * (spec * material.Ks);  
+            vec3 view_direction = normalize(view_position-frag_position);
+            vec3 halfwayDir = normalize(light_direction+view_direction);
+            float spec = pow(max(dot(norm, halfwayDir),0.0), material.shininess);
+            vec3 specular = lightspecular*spec*material.Ks;  
 
             //attenuation
             constant=0.01;
             linear=0.8;
             quadratic=0.1;
-            distance = length(LightPos - FragPos);
-            attenuation = min(1.0f / (constant + linear*distance +quadratic*(distance*distance)),1);   
+            distance = length(light_position-frag_position);
+            attenuation = min(1.0f/(constant+linear*distance+quadratic*(distance*distance)),1);   
 
-            result = ambient*attenuation + diffuse*attenuation + specular*attenuation;
+            result = (ambient+diffuse+specular)*attenuation;
             FragColor = vec4(result, 1.0f);
 
         }
         if(lightMode==2){
             // diffuse
-            vec3 light_direction = normalize(LightPos-FragPos);
-            float diff = max(dot(norm, light_direction), 0.0);
-            vec3 diffuse = light.diffuse *  material.Kd  *  diff ;
+            vec3 light_direction = normalize(light_position-frag_position);
+            float diff = max(dot(norm,light_direction),0.0);
+            vec3 diffuse = light.diffuse*material.Kd*diff ;
 
             // specular
-            vec3 viewDir = normalize(viewPos - FragPos);
-            vec3 halfwayDir = normalize(light_direction + viewDir);
+            vec3 view_direction = normalize(view_position-frag_position);
+            vec3 halfwayDir = normalize(light_direction+view_direction);
             float spec = pow(max(dot(norm, halfwayDir), 0.0), material.shininess);
-            vec3 specular = lightspecular * (spec * material.Ks);  
+            vec3 specular = lightspecular*spec*material.Ks;  
 
             //attenuation
             constant=0.05;
             linear=0.3;
             quadratic=0.6;
-            distance = length(LightPos-FragPos);
+            distance = length(light_position-frag_position);
             theta = dot(light_direction, normalize(-vec3(0,0,-1))); 
             float spoteffect = pow(max(theta, 0), 50);
 
-            if(theta > cos( radians (light.angle))){
-                attenuation = min(1.0f / (constant + linear*distance +quadratic*(distance*distance)),1); 
-                result = spoteffect* (ambient*attenuation+ diffuse*attenuation+specular*attenuation) ;
+            if(theta > cos(radians (light.angle))){
+                attenuation = min(1.0f/(constant+linear*distance+quadratic*(distance*distance)),1); 
+                result = spoteffect*(ambient*attenuation+diffuse*attenuation+specular*attenuation);
             }else{
-				result = spoteffect*ambient ;
+				result = spoteffect*ambient;
             }
             FragColor = vec4(result, 1.0f);
         }
