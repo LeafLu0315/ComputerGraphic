@@ -161,6 +161,7 @@ int model_cnt = model_list.size();
 // New in here
 int cur_mag = 0;
 int cur_min = 0;
+int model_eye_max_index = 6;
 //
 GLuint program;
 
@@ -420,6 +421,7 @@ void RenderScene(int per_vertex_or_per_pixel) {
 
 		// [TODO] Bind texture and modify texture filtering & wrapping mode
 		// Hint: glActiveTexture, glBindTexture, glTexParameteri
+		// Change to be a function
 		refresh(i, per_vertex_or_per_pixel);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
@@ -442,9 +444,11 @@ void printInfo() {
 	cout << "L: switch between directional / point / spot light" << endl;
 	cout << "K: switch to light editing mode" << endl;
 	cout << "J: switch to shininess editing mode" << endl;
+	cout << "Esc: end the program" << endl;
+	cout << "New functions in HW3" << endl;
 	cout << "G : switch the magnification texture filtering mode between nearest / linear sampling" << endl;
 	cout << "B : switch the minification texture filtering mode between nearest / linear_mipmap_linear sampling" << endl;
-	cout << "Esc: end the program" << endl;
+	cout << "Left/Right arrow to switch the eye's texture" << endl;
 	cout << "-----------------------------------------------------------" << endl;
 }
 
@@ -526,10 +530,10 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
 				cur_trans_mode = ShininessEditing;
 			break;
 		case GLFW_KEY_RIGHT:
-			models[cur_idx].cur_eye_offset_idx = (models[cur_idx].cur_eye_offset_idx == 6) ?  0 : models[cur_idx].cur_eye_offset_idx + 1;
+			models[cur_idx].cur_eye_offset_idx = (models[cur_idx].cur_eye_offset_idx == model_eye_max_index) ?  0 : models[cur_idx].cur_eye_offset_idx + 1;
 			break;
 		case GLFW_KEY_LEFT:
-			models[cur_idx].cur_eye_offset_idx = (models[cur_idx].cur_eye_offset_idx == 0) ?  6 : models[cur_idx].cur_eye_offset_idx - 1;
+			models[cur_idx].cur_eye_offset_idx = (models[cur_idx].cur_eye_offset_idx == 0) ? model_eye_max_index : models[cur_idx].cur_eye_offset_idx - 1;
 			break;
 		case GLFW_KEY_G:
 			cur_mag = (cur_mag + 1) % 2;
