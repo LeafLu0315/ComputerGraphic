@@ -367,39 +367,6 @@ void Vector3ToFloat4(Vector3 v, GLfloat res[4])
 	res[3] = 1;
 }
 
-void refresh(int idx, int type) {
-	float x = 0;
-	float y = 0;
-
-	glUniform1i(iLocIsEye, models[cur_idx].shapes[idx].material.isEye);
-	x = floor(models[cur_idx].cur_eye_offset_idx / 4) * 0.5;
-	y = floor(models[cur_idx].cur_eye_offset_idx % 4) * -0.25;
-	glUniform1f(iLocEyeoffsetX, x);
-	glUniform1f(iLocEyeoffsetY, y);
-	glUniform3f(iLocViewPos, main_camera.position[0], main_camera.position[1], main_camera.position[2]);
-	glUniform3f(iLocKa, models[cur_idx].shapes[idx].material.Ka[0], models[cur_idx].shapes[idx].material.Ka[1], models[cur_idx].shapes[idx].material.Ka[2]);
-	glUniform3f(iLocKd, models[cur_idx].shapes[idx].material.Kd[0], models[cur_idx].shapes[idx].material.Kd[1], models[cur_idx].shapes[idx].material.Kd[2]);
-	glUniform3f(iLocKs, models[cur_idx].shapes[idx].material.Ks[0], models[cur_idx].shapes[idx].material.Ks[1], models[cur_idx].shapes[idx].material.Ks[2]);
-	glUniform1i(iLocShadingType, type);
-	glUniform1i(iLocLightMode, light_mode);
-	glUniform1f(iLocShininess, Shininess);
-
-	//lighting
-	if (light_mode == 0) {
-		glUniform3f(iLocLightPosition, lights[0].position[0], lights[0].position[1], lights[0].position[2]);
-		glUniform3f(iLocLightDiffuse, lights[0].diffuse[0], lights[0].diffuse[1], lights[0].diffuse[2]);
-	}
-	if (light_mode == 1) {
-		glUniform3f(iLocLightPosition, lights[1].position[0], lights[1].position[1], lights[1].position[2]);
-		glUniform3f(iLocLightDiffuse, lights[1].diffuse[0], lights[1].diffuse[1], lights[1].diffuse[2]);
-	}
-	if (light_mode == 2) {
-		glUniform3f(iLocLightPosition, lights[2].position[0], lights[2].position[1], lights[2].position[2]);
-		glUniform3f(iLocLightDiffuse, lights[2].diffuse[0], lights[2].diffuse[1], lights[2].diffuse[2]);
-		glUniform1f(iLocCutoffAngle, lights[2].angle);
-	}
-}
-
 // Render function for display rendering
 void RenderScene(int per_vertex_or_per_pixel) {
 	Vector3 modelPos = models[cur_idx].position;
@@ -421,8 +388,34 @@ void RenderScene(int per_vertex_or_per_pixel) {
 
 		// [TODO] Bind texture and modify texture filtering & wrapping mode
 		// Hint: glActiveTexture, glBindTexture, glTexParameteri
-		// Change to be a function
-		refresh(i, per_vertex_or_per_pixel);
+		// renew
+		glUniform1i(iLocIsEye, models[cur_idx].shapes[i].material.isEye);
+		float x = floor(models[cur_idx].cur_eye_offset_idx / 4) * 0.5;
+		float y = floor(models[cur_idx].cur_eye_offset_idx % 4) * -0.25;
+		glUniform1f(iLocEyeoffsetX, x);
+		glUniform1f(iLocEyeoffsetY, y);
+		glUniform3f(iLocViewPos, main_camera.position[0], main_camera.position[1], main_camera.position[2]);
+		glUniform3f(iLocKa, models[cur_idx].shapes[i].material.Ka[0], models[cur_idx].shapes[i].material.Ka[1], models[cur_idx].shapes[i].material.Ka[2]);
+		glUniform3f(iLocKd, models[cur_idx].shapes[i].material.Kd[0], models[cur_idx].shapes[i].material.Kd[1], models[cur_idx].shapes[i].material.Kd[2]);
+		glUniform3f(iLocKs, models[cur_idx].shapes[i].material.Ks[0], models[cur_idx].shapes[i].material.Ks[1], models[cur_idx].shapes[i].material.Ks[2]);
+		glUniform1i(iLocShadingType, per_vertex_or_per_pixel);
+		glUniform1i(iLocLightMode, light_mode);
+		glUniform1f(iLocShininess, Shininess);
+
+		// lighting
+		if (light_mode == 0) {
+			glUniform3f(iLocLightPosition, lights[0].position[0], lights[0].position[1], lights[0].position[2]);
+			glUniform3f(iLocLightDiffuse, lights[0].diffuse[0], lights[0].diffuse[1], lights[0].diffuse[2]);
+		}
+		if (light_mode == 1) {
+			glUniform3f(iLocLightPosition, lights[1].position[0], lights[1].position[1], lights[1].position[2]);
+			glUniform3f(iLocLightDiffuse, lights[1].diffuse[0], lights[1].diffuse[1], lights[1].diffuse[2]);
+		}
+		if (light_mode == 2) {
+			glUniform3f(iLocLightPosition, lights[2].position[0], lights[2].position[1], lights[2].position[2]);
+			glUniform3f(iLocLightDiffuse, lights[2].diffuse[0], lights[2].diffuse[1], lights[2].diffuse[2]);
+			glUniform1f(iLocCutoffAngle, lights[2].angle);
+		}
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 		cur_mag == 0 ? glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST) : glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -1092,7 +1085,6 @@ void setUniformVariables()
 	iLocKa = glGetUniformLocation(program, "material.Ka");
 	iLocKd = glGetUniformLocation(program, "material.Kd");
 	iLocKs = glGetUniformLocation(program, "material.Ks");
-
 
 	iLocIsEye = glGetUniformLocation(program, "isEye");
 	iLocEyeoffsetX = glGetUniformLocation(program, "eyeOffset.x");

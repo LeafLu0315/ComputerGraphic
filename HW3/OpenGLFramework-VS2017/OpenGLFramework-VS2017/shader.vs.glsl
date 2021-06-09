@@ -61,13 +61,7 @@ float theta;
 void main()
 {
     // [TODO]
-    
-	if(isEye==1){
-        texCoord = vec2(aTexCoord.x+eyeOffset.x , aTexCoord.y+eyeOffset.y);
-    }
-	else{
-        texCoord = vec2(aTexCoord.x , aTexCoord.y);
-    }
+    texCoord = (isEye == 1) ? vec2(aTexCoord.x+eyeOffset.x,aTexCoord.y+eyeOffset.y):vec2(aTexCoord.x,aTexCoord.y);
 	gl_Position = um4p * um4v * um4m * vec4(aPos, 1.0);
 	vertex_color = aColor;
     frag_position = vec3(um4v * um4m * vec4(aPos, 1.0));
@@ -89,7 +83,7 @@ void main()
             vec3 halfwayDir = normalize(light_direction + view_direction);
             float spec = pow(max(dot(norm, halfwayDir), 0.0), material.shininess);
             vec3 specular = lightspecular * (spec * material.Ks);
-            
+
 			result = ambient + diffuse + specular;
             vertex_color = result;
         }
